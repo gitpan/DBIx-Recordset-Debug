@@ -15,7 +15,7 @@ require Exporter;
 @EXPORT = qw(
 	
 );
-$VERSION = '1.1';
+$VERSION = '2.0';
 
 
 # Preloaded methods go here.
@@ -28,12 +28,12 @@ sub Debug {
 	'!Mode'  => '>'
 	);
 
-    my %param_in = @_;
+    my %param_in = %{$_[0]};
 
     @param{keys %param_in} = values %param_in;
 
 
-  print Data::Dumper->Dump([\%param,\%param_in],['param','param_in']);
+  warn Data::Dumper->Dump([\%param,\%param_in,\@_],[qw(param param_in input_args)]);
 
     $param{'!Mode'} eq '>' || $param{'!Mode'} eq '>>' ||
 	die "The !Mode parameter must be one of > or >>";
@@ -41,10 +41,16 @@ sub Debug {
     ($param{'!Level'} >= 0 && $param{'!Level'} <= 4)  ||
 	die "The !Level parameter must be between 0 and 4";
 
+
+
+    warn "opening $param{'!File'} with mode $param{'!Mode'}";
     my $fh = new FileHandle "$param{'!Mode'} $param{'!File'}";
     defined($fh) 
 	|| die "Attempt to open filehandle $param{'!File'} failed: $!";
 
+
+
+    $DBIx::Recordset::Debug = $param{'!Level'};
     *DBIx::Recordset::LOG = $fh;
 }
 
@@ -104,6 +110,15 @@ FileHandle module and will take either the overwrite or append syntax.
 Other syntaxes are rejected.
 
 =cut
+
+=head1 BUGS
+
+The last part of the log does not go to the file because I did not
+force non-buffered output.
+
+I don't know enough about select(), $| and local() to get this done.
+Help appreciated.
+
 
 =head1 AUTHOR
 
