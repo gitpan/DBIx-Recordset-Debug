@@ -1,0 +1,5 @@
+Revision history for Perl extension DBIx::Recordset::Debug.
+
+0.01  Thu Apr 27 15:06:49 2000
+	- original version; created by h2xs 1.19
+
